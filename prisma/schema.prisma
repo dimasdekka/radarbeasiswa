@@ -1,0 +1,154 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  avatar       String?
+  role         String        @default("USER") // USER | ADMIN
+  profile      Profile?
+  applications Application[]
+  saved        SavedBeasiswa[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Profile {
+  id              String                  @id @default(cuid())
+  userId          String                  @unique
+  tipe            String                  // SMA | MAHASISWA
+  kelas           String?
+  namaSekolah     String?
+  nilaiRataRata   Float?
+  prestasi        String[]
+  jenjang         String?
+  jurusan         String?
+  universitas     String?
+  ipk             Float?
+  toefl           Int?
+  ielts           Float?
+  pengalaman      String[]
+  publikasi       String[]
+  ekstrakurikuler String[]
+  targetJenjang   String?
+  targetNegara    String[]
+  targetBidang    String[]
+  butuhFinansial  Boolean                 @default(false)
+  embedding       Unsupported("vector(768)")?
+  user            User                    @relation(fields: [userId], references: [id])
+  updatedAt       DateTime                @updatedAt
+}
+
+model Beasiswa {
+  id              String        @id @default(cuid())
+  nama            String
+  provider        String
+  negara          String
+  jenjang         String[]
+  targetUser      String[]
+  deadline        DateTime?
+  deadlineNote    String?
+  cakupan         String[]
+  ipkMinimum      Float?
+  nilaiMinimum    Float?
+  toeflMinimum    Int?
+  ieltsMinimum    Float?
+  pengalamanMin   Int?
+  bidangStudi     String[]
+  bahasa          String[]
+  persyaratan     Json
+  rubrikEssay     Json?
+  checklistDok    String[]
+  urlResmi        String
+  imageUrl        String?
+  sourceType      String        @default("MANUAL") // MANUAL | SCRAPED
+  sourceUrl       String?
+  verified        Boolean       @default(false)
+  verifiedAt      DateTime?
+  lastScrapedAt   DateTime?
+  aktif           Boolean       @default(true)
+  embedding       Unsupported("vector(768)")?
+  applications    Application[]
+  savedBy         SavedBeasiswa[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model ScrapedScholarship {
+  id              String    @id @default(cuid())
+  sourceName      String
+  sourceUrl       String
+  rawTitle        String?
+  rawContent      String   @db.Text
+  normalizedData  Json?
+  status          String   @default("PENDING_REVIEW")
+  // PENDING_REVIEW | APPROVED | REJECTED | NEEDS_UPDATE
+  duplicateOfId   String?
+  errorMessage    String?
+  scrapedAt       DateTime @default(now())
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ScrapingSource {
+  id              String    @id @default(cuid())
+  name            String
+  url             String
+  type            String    // OFFICIAL | CAMPUS | PROVIDER
+  active          Boolean   @default(true)
+  schedule        String?   // DAILY | WEEKLY | MONTHLY
+  lastRunAt       DateTime?
+  lastStatus      String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model SavedBeasiswa {
+  id          String   @id @default(cuid())
+  userId      String
+  beasiswaId  String
+  user        User     @relation(fields: [userId], references: [id])
+  beasiswa    Beasiswa @relation(fields: [beasiswaId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, beasiswaId])
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  userId      String
+  beasiswaId  String
+  matchScore  Float
+  status      String   @default("RISET")
+  checklist   Json     @default("{}")
+  essays      Essay[]
+  user        User     @relation(fields: [userId], references: [id])
+  beasiswa    Beasiswa @relation(fields: [beasiswaId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, beasiswaId])
+}
+
+model Essay {
+  id             String      @id @default(cuid())
+  applicationId  String
+  judul          String
+  konten         String      @db.Text
+  feedback       Json?
+  versi          Int         @default(1)
+  application    Application @relation(fields: [applicationId], references: [id])
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}

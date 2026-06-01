@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env*
+!.env.example
+*.log
+.DS_Store
+README.md
+DEPLOY.md
+PRD_BeasiswaRadar_Revisi_Scraping_Filter_Profile.md
+.vscode
+.idea
+coverage
+.cache

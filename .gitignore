@@ -26,6 +26,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
 
 # vercel
@@ -34,3 +35,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# Kiro MCP config (contains API keys)
+.kiro/settings/mcp.json
+
+# Kiro steering / skill data (local dev only)
+.kiro/
+
+# Editor config
+.vscode/
+
+# Internal PRD (not for public repo)
+PRD_BeasiswaRadar_Revisi_Scraping_Filter_Profile.md
+
+# Local logs
+dev.log
+dev-err.log
+scrape-log.txt
+*.log

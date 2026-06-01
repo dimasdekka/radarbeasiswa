@@ -1,0 +1,32 @@
+# Files NOT uploaded to Cloud Build. The Docker build installs deps and builds,
+# so we skip heavy/local-only and secret files. Keep public/, src/, prisma/, etc.
+
+.git
+.gitignore
+node_modules
+.next
+out
+build
+
+# Local env & secrets (server env is set on Cloud Run, not baked in)
+.env
+.env*.local
+
+# Editor / tooling
+.vscode
+.idea
+.kiro
+*.log
+dev.log
+dev-err.log
+scrape-log.txt
+
+# Docs / reference clones
+README.md
+DEPLOY.md
+PRD_BeasiswaRadar_Revisi_Scraping_Filter_Profile.md
+tmp-3dearth
+
+# OS
+.DS_Store
+Thumbs.db
